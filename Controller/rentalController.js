@@ -14,28 +14,60 @@ const web3Pro = new Web3(new Web3.providers.HttpProvider(URL));
 
 const RentalContract = new web3Pro.eth.Contract(rental_abi, rentalContractAddress);
 
-module.exports.updateRewards = async (req, res) => {
-    const currentRewardId = await RentalContract.methods.getCurrentRewrdId().call().catch((err) => {return res.status(400).send({Error: err})});
-    if (currentRewardId > 0) {
-        for (let i = 1; i <= parseInt(currentRewardId); i++) {
-            const getRental = await Rental.find({rewardId: i}).catch((err) => {return res.status(400).send({Error: err})})
-            const getReward = await RentalContract.methods._rewardForPool(i).call().catch((err) => {return res.status(400).send({Error: err})});
-            if (getRental.length === 0) {
-                const rentalData = {
-                    rewardId: i,
-                    rewardAmount: getReward/10**18,
-                    totalReward: getReward/10**18
-                }
-                const rental = new Rental(rentalData);
-                const result = await rental.save().catch((err) => {return res.status(400).send({Error: err})})
-            } else {
-                const updateRental = await Rental.findOneAndUpdate({rewardId: i}, {rewardAmount: getRental[0].rewardAmount + getReward/10**18, totalReward: getRental[0].totalReward + getReward/10**18}).catch((err) => {return res.status(400).send({Error: err})})
-                // console.log(getRental[0])
-            }
-        }        
-    }
+// module.exports.updateRewards = async (req, res) => {
+//     const currentRewardId = await RentalContract.methods.getCurrentRewrdId().call().catch((err) => {return res.status(400).send({Error: err})});
+//     if (currentRewardId > 0) {
+//         for (let i = 1; i <= parseInt(currentRewardId); i++) {
+//             const getRental = await Rental.find({rewardId: i}).catch((err) => {return res.status(400).send({Error: err})})
+//             const getReward = await RentalContract.methods._rewardForPool(i).call().catch((err) => {return res.status(400).send({Error: err})});
+//             if (getRental.length === 0) {
+//                 const rentalData = {
+//                     rewardId: i,
+//                     rewardAmount: getReward/10**18,
+//                     totalReward: getReward/10**18
+//                 }
+//                 const rental = new Rental(rentalData);
+//                 const result = await rental.save().catch((err) => {return res.status(400).send({Error: err})})
+//             } else {
+//                 const updateRental = await Rental.findOneAndUpdate({rewardId: i}, {rewardAmount: getRental[0].rewardAmount + getReward/10**18, totalReward: getRental[0].totalReward + getReward/10**18}).catch((err) => {return res.status(400).send({Error: err})})
+//                 // console.log(getRental[0])
+//             }
+//         }        
+//     }
 
-    return res.status(200).send("Done");
+//     return res.status(200).send("Done");
+// }
+
+module.exports.updateRewards = async (req, res) => {
+    let init = Number(req.body.init)
+    let final = init + 50
+    const currentRewardId = await RentalContract.methods.getCurrentRewrdId().call().catch((err) => {
+        console.log(err)
+        return res.status(400).send({Error: err})
+    });
+    if (final > currentRewardId) {
+        final = currentRewardId;
+    }
+    for (let i = init; i <= final; i++) {
+        const getRental = await Rental.find({rewardId: i}).catch((err) => {
+            console.log(err)
+            return res.status(400).send({Error: err})
+        });
+        const getReward = await RentalContract.methods._rewardForPool(i).call()
+        if (getRental.length === 0) {
+            const rentalData = {
+                rewardId: i,
+                rewardAmount: getReward/10**18,
+                totalReward: getReward/10**18,
+                currentPay: getReward/10**18
+            }
+            const rental = new Rental(rentalData);
+            const result = await rental.save()
+        } else {
+            const updateRental = await Rental.findOneAndUpdate({rewardId: i}, {rewardAmount: getRental[0].rewardAmount + getReward/10**18, totalReward: getRental[0].totalReward + getReward/10**18, currentPay: getReward/10**18})
+        }
+    }
+    return res.status(200).send("Done");    
 }
 
 module.exports.claimRewards = async (req, res) => {

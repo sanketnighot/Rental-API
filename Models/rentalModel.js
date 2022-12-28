@@ -4,6 +4,9 @@ module.exports.Rental = model("Rental", Schema({
     rewardId: {
         type     : Number
     },
+    currentPay: {
+        type     : Number
+    },
     rewardAmount: {
         type     : Number,
     },
