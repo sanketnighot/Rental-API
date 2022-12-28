@@ -1,0 +1,32 @@
+{
+  "name": "mapapilol",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.25.0",
+    "bcrypt": "^5.0.1",
+    "body-parser": "^1.19.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.2",
+    "ipfs": "^0.62.1",
+    "ipfs-mini": "^1.1.5",
+    "keccak256": "^1.0.6",
+    "lodash": "^4.17.21",
+    "merkletreejs": "^0.3.0",
+    "mongoose": "^6.2.1",
+    "node-cron": "^3.0.2",
+    "pm2": "^5.2.2",
+    "web3": "^1.8.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
