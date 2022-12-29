@@ -80,6 +80,12 @@ module.exports.getRewards = async (req, res) => {
     }).catch((err) => {return res.status(400).send({Error: err})})
 } 
 
+module.exports.getTotalRewards = async (req, res) => {
+    const getRental = await Rental.findOne({rewardId: req.query.rewardId}).then(async (data) => {
+        return res.status(200).send(data);
+    }).catch((err) => {return res.status(400).send({Error: err})})
+} 
+
 module.exports.updateMerkleRoot = async (req, res) => {
     const deleteEntries = await RentalClaim.deleteMany({}).catch((err) => {return res.status(400).send({Error: err})})
     const getRental = await Rental.find().catch((err) => {return res.status(400).send({Error: err})})
