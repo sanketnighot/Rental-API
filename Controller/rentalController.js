@@ -8,7 +8,7 @@ const keccak256 = require("keccak256");
 var Web3 = require('web3');
 const {rental_abi} = require('./abi');
 
-const rentalContractAddress = "0x21C048bdf79ED3E7A9EedF5a17A8eCD206E430a1"
+const rentalContractAddress = "0x3426042A6eb767493551ECA9Bfe8f3AC85712Bfb"
 const URL = "https://eth-goerli.g.alchemy.com/v2/XvCWKtxc5r_re6uSpNMlqiBDcy5DK-oj";
 const web3Pro = new Web3(new Web3.providers.HttpProvider(URL));
 const { ethers } = require("ethers");
