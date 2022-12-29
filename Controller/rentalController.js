@@ -69,7 +69,9 @@ module.exports.updateRewards = async (req, res) => {
 }
 
 module.exports.claimRewards = async (req, res) => {
-    const getRental = await Rental.findOneAndUpdate({rewardId: req.body.rewardId}, {rewardAmount: 0}).catch((err) => {return res.status(400).send({Error: err})})
+    const getRentalClaim = await RentalClaim.findOne({rewardId: req.body.rewardId}).catch((err) => {return res.status(400).send({Error: err})})
+    const getRentalRwd = await Rental.findOne({rewardId: req.body.rewardId}).catch((err) => {return res.status(400).send({Error: err})})
+    const getRental = await Rental.findOneAndUpdate({rewardId: req.body.rewardId}, {rewardAmount: getRentalRwd.rewardAmount - getRentalClaim.rewardAmount}).catch((err) => {return res.status(400).send({Error: err})})
     const getRentals = await RentalClaim.findOneAndUpdate({rewardId: req.body.rewardId}, {claimed: true}).catch((err) => {return res.status(400).send({Error: err})})
     return res.status(200).send({message: "Field Updated"});
 }
