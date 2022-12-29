@@ -5,7 +5,7 @@ router.route('/updateRewards').post(updateRewards);
 router.route('/updateMerkleRoot').get(updateMerkleRoot);
 router.route('/getMerkleProof').post(getMerkleProof);
 router.route('/claimRewards').post(claimRewards);
-router.route('/getTotalRewards').post(getTotalRewards);
+router.route('/getTotalRewards').get(getTotalRewards);
 router.route('/getRewards').get(getRewards);
 
 module.exports = router;
