@@ -55,13 +55,7 @@ module.exports.rental_abi = [
 			}
 		],
 		"name": "claimRewards",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "rewards",
-				"type": "uint256"
-			}
-		],
+		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
