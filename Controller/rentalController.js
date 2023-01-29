@@ -29,7 +29,7 @@ module.exports.updateMainRewards = async (req, res) => {
             console.log(i, ": ", getReward[0])
             const data = {
                 rewardId: i,
-                rewardAmount: getReward[0]
+                rewardAmount: getReward[0]/1000000000000000000
             }
             const rentalHis = new Rental(data)
             const result = await rentalHis.save()
