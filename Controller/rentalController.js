@@ -3,42 +3,43 @@ const axios = require('axios');
 require('dotenv').config();
 const {Rental} = require('../Models/rentalModel');
 const {RentalClaim} = require('../Models/rentalClaimModel');
+const {RentalHistory} = require('../Models/rentalHistory');
 const { MerkleTree } = require("merkletreejs");
 const keccak256 = require("keccak256");
 var Web3 = require('web3');
 const {rental_abi} = require('./abi');
 
-const rentalContractAddress = "0x3426042A6eb767493551ECA9Bfe8f3AC85712Bfb"
-const URL = "https://eth-goerli.g.alchemy.com/v2/XvCWKtxc5r_re6uSpNMlqiBDcy5DK-oj";
+const rentalContractAddress = "0xca63b89db5a634ad465927ff63e0fd1495928e23"
+const URL = "https://eth-mainnet.g.alchemy.com/v2/4Yu3Crvr9V7owxJ-msc99y94RTQjKEB-";
 const web3Pro = new Web3(new Web3.providers.HttpProvider(URL));
 const { ethers } = require("ethers");
 
 const RentalContract = new web3Pro.eth.Contract(rental_abi, rentalContractAddress);
 
-// module.exports.updateRewards = async (req, res) => {
-//     const currentRewardId = await RentalContract.methods.getCurrentRewrdId().call().catch((err) => {return res.status(400).send({Error: err})});
-//     if (currentRewardId > 0) {
-//         for (let i = 1; i <= parseInt(currentRewardId); i++) {
-//             const getRental = await Rental.find({rewardId: i}).catch((err) => {return res.status(400).send({Error: err})})
-//             const getReward = await RentalContract.methods._rewardForPool(i).call().catch((err) => {return res.status(400).send({Error: err})});
-//             if (getRental.length === 0) {
-//                 const rentalData = {
-//                     rewardId: i,
-//                     rewardAmount: getReward/10**18,
-//                     totalReward: getReward/10**18
-//                 }
-//                 const rental = new Rental(rentalData);
-//                 const result = await rental.save().catch((err) => {return res.status(400).send({Error: err})})
-//             } else {
-//                 const updateRental = await Rental.findOneAndUpdate({rewardId: i}, {rewardAmount: getRental[0].rewardAmount + getReward/10**18, totalReward: getRental[0].totalReward + getReward/10**18}).catch((err) => {return res.status(400).send({Error: err})})
-//                 // console.log(getRental[0])
-//             }
-//         }        
-//     }
-
-//     return res.status(200).send("Done");
-// }
-
+module.exports.updateMainRewards = async (req, res) => {
+    let init = 1
+    let final = 60
+    let count = 0
+    for (let i = init; i <= final; i++) {
+        const getRewardInfo = await RentalContract.methods.getLandLordsInfo(i).call()
+        // .catch(err => {console.log(err)})
+        if (getRewardInfo.status) {
+            const getReward = await RentalContract.methods.getcalculateRewards(i).call()
+            // .catch(err => {console.log(err)})
+            console.log(i, ": ", getReward[0])
+            const data = {
+                rewardId: i,
+                rewardAmount: getReward[0]
+            }
+            const rentalHis = new RentalHistory(data)
+            const result = await rentalHis.save()
+            count += 1
+        }
+    }
+    console.log("Count: ", count)
+    return res.status(200).send("Done Update");    
+}
+ 
 module.exports.updateRewards = async (req, res) => {
     let init = Number(req.body.init)
     let final = init + 50
@@ -65,7 +66,7 @@ module.exports.updateRewards = async (req, res) => {
             const updateRental = await Rental.findOneAndUpdate({rewardId: i}, {rewardAmount: getRental[0].rewardAmount + getReward/10**18, totalReward: getRental[0].totalReward + getReward/10**18, currentPay: getReward/10**18})
         }
     }
-    return res.status(200).send("Done Update");    
+    return res.status(200).send("Done Update");
 }
 
 module.exports.claimRewards = async (req, res) => {
