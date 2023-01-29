@@ -18,7 +18,7 @@ const RentalContract = new web3Pro.eth.Contract(rental_abi, rentalContractAddres
 
 module.exports.updateMainRewards = async (req, res) => {
     let init = 1
-    let final = 60
+    let final = 66
     let count = 0
     for (let i = init; i <= final; i++) {
         const getRewardInfo = await RentalContract.methods.getLandLordsInfo(i).call()
@@ -31,7 +31,7 @@ module.exports.updateMainRewards = async (req, res) => {
                 rewardId: i,
                 rewardAmount: getReward[0]
             }
-            const rentalHis = new RentalHistory(data)
+            const rentalHis = new Rental(data)
             const result = await rentalHis.save()
             count += 1
         }
