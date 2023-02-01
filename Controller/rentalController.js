@@ -42,7 +42,7 @@ module.exports.updateMainRewards = async (req, res) => {
  
 module.exports.updateRewards = async (req, res) => {
     let init = Number(req.body.init)
-    let final = init + 50
+    let final = init + 49
     const currentRewardId = Number(req.body.rewardId)
     if (final > currentRewardId) {
         final = currentRewardId;
@@ -52,19 +52,25 @@ module.exports.updateRewards = async (req, res) => {
             console.log(err)
             return res.status(400).send({Error: err})
         });
-        const getReward = await RentalContract.methods._rewardForPool(i).call()
-        if (getRental.length === 0) {
-            const rentalData = {
-                rewardId: i,
-                rewardAmount: getReward/1000000000000000000,
-                totalReward: getReward/1000000000000000000,
-                currentPay: getReward/1000000000000000000
-            }
-            const rental = new Rental(rentalData);
-            const result = await rental.save()
-        } else {
-            const updateRental = await Rental.findOneAndUpdate({rewardId: i}, {rewardAmount: getRental[0].rewardAmount + getReward/10**18, totalReward: getRental[0].totalReward + getReward/10**18, currentPay: getReward/10**18})
+        const getReward = await RentalContract.methods._rewardForPool(i).call().catch((err)=>{
+            console.log("X" ,"->", i)
+        })
+        if (!isNaN(Number(getReward))) {
+            console.log(getReward ,"->", i)
+            if (getRental.length === 0) {
+                const rentalData = {
+                    rewardId: i,
+                    rewardAmount: Number(getReward)/1000000000000000000,
+                    totalReward: Number(getReward)/1000000000000000000,
+                    currentPay: Number(getReward)/1000000000000000000
+                }
+                const rental = new Rental(rentalData);
+                const result = await rental.save()
+            } else {
+                const updateRental = await Rental.findOneAndUpdate({rewardId: i}, {rewardAmount: getRental[0].rewardAmount + getReward/1000000000000000000, totalReward: getRental[0].totalReward + getReward/1000000000000000000, currentPay: getReward/1000000000000000000})
+            }    
         }
+        
     }
     return res.status(200).send("Done Update");
 }
