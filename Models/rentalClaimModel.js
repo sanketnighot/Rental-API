@@ -8,9 +8,11 @@ module.exports.RentalClaim = model("RentalClaim", Schema({
         type     : Boolean
     },
     rewardAmount: {
-        type     : Number,
+        type     : String,
+        default  : 0
     },
     totalReward: {
         type     : Number,
+        default  : 0
     }
 }, { timestamps : true }));

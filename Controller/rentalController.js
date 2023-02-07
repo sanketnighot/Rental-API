@@ -8,6 +8,7 @@ const { MerkleTree } = require("merkletreejs");
 const keccak256 = require("keccak256");
 var Web3 = require('web3');
 const {rental_abi} = require('./abi');
+const Rewards = require('./reward.json');
 
 const rentalContractAddress = "0xca63b89db5a634ad465927ff63e0fd1495928e23"
 const URL = "https://eth-mainnet.g.alchemy.com/v2/4Yu3Crvr9V7owxJ-msc99y94RTQjKEB-";
@@ -96,19 +97,19 @@ module.exports.getTotalRewards = async (req, res) => {
 } 
 
 module.exports.updateMerkleRoot = async (req, res) => {
-    const deleteEntries = await RentalClaim.deleteMany({}).catch((err) => {return res.status(400).send({Error: err})})
-    const getRental = await Rental.find().catch((err) => {return res.status(400).send({Error: err})})
+    // const deleteEntries = await RentalClaim.deleteMany({}).catch((err) => {return res.status(400).send({Error: err})})
+    // const getRental = await Rental.find().catch((err) => {return res.status(400).send({Error: err})})
 
-    let data = []
-    for (i in getRental) {
-        const rentalData = _.pick(getRental[i],["rewardId", "rewardAmount", "totalReward"]);
-        rentalData.claimed = false
-        const rental = new RentalClaim(rentalData);
-        const result = await rental.save().catch((err) => {return res.status(400).send({Error: err})})
-        data.push(`${getRental[i].rewardId},${getRental[i].rewardAmount * 1000000000000000000}`)
-    }
-    console.log(data)
-    let leaves = data.map(addr => keccak256(addr))
+    // let data = []
+    // for (i in getRental) {
+    //     const rentalData = _.pick(getRental[i],["rewardId", "rewardAmount", "totalReward"]);
+    //     rentalData.claimed = false
+    //     const rental = new RentalClaim(rentalData);
+    //     const result = await rental.save().catch((err) => {return res.status(400).send({Error: err})})
+    //     data.push(`${getRental[i].rewardId},${getRental[i].rewardAmount * 1000000000000000000}`)
+    // }
+    // console.log(data)
+    let leaves = Rewards.map(addr => keccak256(addr))
     let merkleTree = new MerkleTree(leaves, keccak256, {sortPairs: true})
     const rootHash = merkleTree.getHexRoot()
     console.log(rootHash);
@@ -117,19 +118,19 @@ module.exports.updateMerkleRoot = async (req, res) => {
 
 module.exports.getMerkleProof = async (req, res) => {
     const getRental = await RentalClaim.find().catch((err) => {return res.status(400).send({Error: err})})
-    let data = []
+    // let data = []
     let getData = 0
-    for (i in getRental) {
-        data.push(`${getRental[i].rewardId},${(getRental[i].rewardAmount * 1000000000000000000)}`)
-        console.log(data)
-    }
-    let leaves = await data.map(addr => keccak256(addr))
+    // for (i in getRental) {
+    //     data.push(`${getRental[i].rewardId},${(getRental[i].rewardAmount * 1000000000000000000)}`)
+    //     console.log(data)
+    // }
+    let leaves = await Rewards.map(addr => keccak256(addr))
     let merkleTree = new MerkleTree(leaves, keccak256, {sortPairs: true})
     const rootHash = merkleTree.getHexRoot()
     console.log(rootHash);
 
     const getProofData = await RentalClaim.findOne({rewardId: req.body.rewardId}).then(async (data) => {
-        getData = `${data.rewardId},${data.rewardAmount * 1000000000000000000}`
+        getData = `${data.rewardId},${data.rewardAmount}`
     }).catch((err) => {return res.status(400).send({Error: err})})
     console.log(getData)
     let prove = getData // The input
